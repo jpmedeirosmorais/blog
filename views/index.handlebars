@@ -1,0 +1,24 @@
+<div class="jumbotron">
+  <h1 class="display-4">Bem vindo ao blog do JP</h1>
+  <p class="lead">Este blog é experimental e não tem nem um vinculo comercial, feito apenas para estudo.</p>
+  <hr class="my-4">
+  <p>It uses utility classes for typography and spacing to space content out within the larger container.</p>
+  <a class="btn btn-primary btn-lg" href="#" role="button">Crie uma conta</a>
+</div>
+
+<hr>
+
+<h2>Postagens recentes: </h2>
+{{#each postagens}}
+<div class="card">
+    <div class="card-body">
+        <h3>{{titulo}}</h3>
+        <p>{{descricao}}</p>
+        <small>{{data}}</small>
+    </div>
+
+</div>
+{{else}}
+    <h5>Nehuma postagem foi criada :(</h5>
+
+{{/each}}
