@@ -1,19 +1,18 @@
 const express = require('express')
 const router = express.Router()
 const mongoose = require('mongoose')
-
 require('../models/Categoria')
 const Categoria = mongoose.model('categorias')
-
 require('../models/Postagem')
 const Postagem = mongoose.model('postagens')
+const {eAdmin} = require('../helpers/eAdmin')
 
 
-router.get('/',(req, res) =>{
+router.get('/', eAdmin,(req, res) =>{
     res.render('admin/index')
 })
 
-router.get('/posts', (req, res) =>{
+router.get('/posts', eAdmin, (req, res) =>{
     res.send('Página de posts')
 })
 
@@ -21,10 +20,10 @@ router.get('/posts', (req, res) =>{
 
 ////////////////////INICIO DAS ROTAS DE CATEGORIA////////////////
                 //Página de exibição das categorias//
-router.get('/categorias',(req, res) =>{
+router.get('/categorias', eAdmin,(req, res) =>{
     //Define a exibição do formulário categorias.handlebars em ordem decrescente a data em que foi criado, mostrando primeiro as ultimas categorias criadas.//
     Categoria.find().sort({date: 'DESC'}).then((categorias) =>{
-        res.render('admin/categorias', { categorias: categorias
+        res.render('admin/categorias', eAdmin, { categorias: categorias
         })
     }).catch((err) =>{
         req.flash('error_msg', 'Houve um erro ao listar categorias!')
@@ -34,12 +33,12 @@ router.get('/categorias',(req, res) =>{
 })
 
 //Renderiza a página de adição de categorias novas//
-router.get('/categorias/add', (req, res) =>{
+router.get('/categorias/add', eAdmin, (req, res) =>{
     res.render('admin/addcategorias')
 })
 
 //salva usando o metódo 'post', a nova categoria cadastrada
-router.post('/categorias/nova', (req, res) =>{
+router.post('/categorias/nova', eAdmin, (req, res) =>{
     var erros = []
 
     //Verifica se está sendo criado uma categoria em branco ou se está com nome muito pequeno e impede que cadastre nomes em branco ou muito curtos ou de tipo undefined
@@ -74,7 +73,7 @@ router.post('/categorias/nova', (req, res) =>{
 
             //Rotas de edição de categoria//
 
-    router.get('/categorias/edit/:id', (req, res) => {
+    router.get('/categorias/edit/:id', eAdmin, (req, res) => {
         Categoria.findOne({_id:req.params.id}).then((categoria) =>{
             res.render('admin/editcategorias', {categoria:categoria})
         }).catch((err) =>{
@@ -84,7 +83,7 @@ router.post('/categorias/nova', (req, res) =>{
         
     })
 
-    router.post('/categorias/edit', (req, res) => {
+    router.post('/categorias/edit', eAdmin, (req, res) => {
         Categoria.findOne({_id: req.body.id}).then((categoria) =>{
             categoria.nome = req.body.nome
             categoria.slug = req.body.slug
@@ -105,7 +104,7 @@ router.post('/categorias/nova', (req, res) =>{
 
     })
 
-    router.post('/categorias/deletar', (req, res) =>{
+    router.post('/categorias/deletar', eAdmin, (req, res) =>{
         Categoria.deleteOne({_id: req.body.id}).then(() =>{
             req.flash('success_msg', 'Categoria deletada com sucesso!')
             res.redirect('/admin/categorias')
@@ -119,7 +118,7 @@ router.post('/categorias/nova', (req, res) =>{
     
 ///////////////////INICIO DAS ROTAS DE POSTAGEM///////////////////////
 
-    router.get('/postagens', (req, res) =>{
+    router.get('/postagens', eAdmin, (req, res) =>{
         Postagem.find().populate('categoria').sort({data: 'desc'}).then((postagens) =>{
             res.render('admin/postagens', {postagens: postagens})
         }).catch((err) =>{
@@ -129,7 +128,7 @@ router.post('/categorias/nova', (req, res) =>{
         
     })
 
-    router.get('/postagens/add', (req, res) =>{
+    router.get('/postagens/add', eAdmin, (req, res) =>{
         Categoria.find().then((categorias) => {
             res.render('admin/addpostagem', {categorias: categorias})
         }).catch((err) =>{
@@ -139,7 +138,7 @@ router.post('/categorias/nova', (req, res) =>{
         
     })
 
-    router.post('/postagens/nova', (req, res) => {
+    router.post('/postagens/nova', eAdmin, (req, res) => {
         
         var erros = []
        
@@ -170,7 +169,7 @@ router.post('/categorias/nova', (req, res) =>{
 
     })
 
-    router.get('/postagens/edit/:id', (req, res) => {
+    router.get('/postagens/edit/:id', eAdmin, (req, res) => {
 
         Postagem.findOne({_id: req.params.id}).then((postagem) => {
             Categoria.find().then((categorias) => {
@@ -186,7 +185,7 @@ router.post('/categorias/nova', (req, res) =>{
         //res.render('admin/editpostagens')
     })
 
-    router.post('/postagem/edit', (req, res) => {
+    router.post('/postagem/edit', eAdmin, (req, res) => {
         Postagem.findOne({_id: req.body.id}).then((postagem) => {
 
             postagem.titulo = req.body.titulo
@@ -209,7 +208,7 @@ router.post('/categorias/nova', (req, res) =>{
         })
     })
 
-    router.get('/postagens/deletar/:id' , (req, res) => {
+    router.get('/postagens/deletar/:id' , eAdmin, (req, res) => {
         Postagem.deleteOne({_id: req.params.id}).then(() =>{
             req.flash('success_msg','Postagem deletada com sucesso.')
             res.redirect('/admin/postagens')

@@ -13,6 +13,9 @@
     require('./models/Categoria')
     const Categoria = mongoose.model('categorias')
     const usuarios = require('./routes/usuario')
+    const passport = require('passport')
+    require('./config/auth')(passport)
+
 // Configurações
     // Sessão
         app.use(session({
@@ -20,13 +23,18 @@
             resave: true,
             saveUninitialized: true
         }))
+
+        app.use(passport.initialize())
+        app.use(passport.session())
         app.use(flash())
     // Middlware
         app.use((req, res, next) => {
             res.locals.success_msg = req.flash('success_msg')
             res.locals.error_msg = req.flash('error_msg')
             next()
-        })    
+            res.locals.error = req.flash('error')
+            res.locals.user = req.user || null;
+         })    
     // Body Parser
     app.use(bodyParser.urlencoded({extended: true}))
     app.use(bodyParser.json())
